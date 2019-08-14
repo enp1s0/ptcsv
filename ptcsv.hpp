@@ -69,7 +69,7 @@ public:
 		}
 		return t_col;
 	}
-}
+};
 } // namespace mtk
 
 #endif /* end of include guard */
