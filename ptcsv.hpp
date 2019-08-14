@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <sstream>
 
-#define PTCSV_AS_SET(type, func) template <> inline type as<type>(const std::string str) {return func(str);}
+#define PTCSV_AS_SET(type, func) template <> inline type as<type>(const std::string str) {return func(str.c_str());}
 
 namespace mtk {
 namespace utils {
