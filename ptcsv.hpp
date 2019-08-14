@@ -65,7 +65,7 @@ public:
 	inline std::vector<T> get_col_as(const std::string col_name) const {
 		std::vector<T> t_col(get_num_rows());
 		for(std::size_t i = 0; i < get_num_rows(); i++) {
-			t_col[i] = utils::as<T>(data[col_name][i]);
+			t_col[i] = utils::as<T>(data.at(col_name)[i]);
 		}
 		return t_col;
 	}
