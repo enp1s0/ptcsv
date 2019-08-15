@@ -39,8 +39,10 @@ private:
 	std::map<std::string, std::vector<std::string>> data;
 	std::size_t num_data;
 public:
-	ptcsv();
-	ptcsv(const std::string filename);
+	inline ptcsv() : num_data(0lu) {};
+	inline ptcsv(const std::string filename) : ptcsv() {
+		load_csv(filename);
+	}
 
 	inline void load_csv(const std::string filename, const char comment_head = '\0') {
 		std::string buffer;
