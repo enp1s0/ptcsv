@@ -38,6 +38,7 @@ class ptcsv {
 private:
 	std::map<std::string, std::vector<std::string>> data;
 	std::size_t num_data;
+	std::vector<std::string> col_names;
 public:
 	inline ptcsv() : num_data(0lu) {};
 	inline ptcsv(const std::string filename) : ptcsv() {
@@ -53,9 +54,16 @@ public:
 		}
 
 		while(std::getline(ifs, buffer) && buffer.data()[0] == comment_head);
-		const auto cols_names = utils::split(buffer);
-		for(const auto& col_name : cols_names) {
+		col_names = utils::split(buffer);
+		for(const auto& col_name : col_names) {
 			data.insert(std::make_pair(col_name, std::vector<std::string>{}));
+		}
+
+		while(std::getline(ifs, buffer)) {
+			const auto row_values = utils::split(buffer);
+			for(std::size_t i = 0; i < data.size() && i < row_values.size(); i++) {
+				data.at(col_names[i]).push_back(row_values[i]);
+			}
 		}
 	}
 
