@@ -55,7 +55,7 @@ public:
 		while(std::getline(ifs, buffer) && buffer.data()[0] == comment_head);
 		const auto cols_names = utils::split(buffer);
 		for(const auto& col_name : cols_names) {
-			data.push_back(std::make_pair<std::string, std::vector>(col_name, std::vector{}));
+			data.insert(std::make_pair(col_name, std::vector<std::string>{}));
 		}
 	}
 
