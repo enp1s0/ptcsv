@@ -87,6 +87,14 @@ public:
 		}
 		return t_col;
 	}
+
+	std::map<std::string, std::string> get_row_at(const std::size_t r) const {
+		std::map<std::string, std::string> row;
+		for(const auto& col_name : col_names) {
+			row.insert(std::make_pair(col_name, data.at(col_name)[r]));
+		}
+		return row;
+	}
 };
 } // namespace mtk
 
