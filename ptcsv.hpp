@@ -60,10 +60,14 @@ public:
 		}
 
 		while(std::getline(ifs, buffer)) {
+			if(buffer.data()[0] == comment_head) {
+				continue;
+			}
 			const auto row_values = utils::split(buffer);
 			for(std::size_t i = 0; i < data.size() && i < row_values.size(); i++) {
 				data.at(col_names[i]).push_back(row_values[i]);
 			}
+			num_data++;
 		}
 	}
 
