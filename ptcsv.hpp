@@ -95,6 +95,14 @@ public:
 		}
 		return row;
 	}
+
+	inline std::vector<std::map<std::string, std::string>> get_rows() const {
+		std::vector<std::map<std::string, std::string>> rows(num_data);
+		for(std::size_t i = 0; i < num_data; i++) {
+			rows[i] = get_row_at(i);
+		}
+		return rows;
+	}
 };
 } // namespace mtk
 
