@@ -79,6 +79,10 @@ public:
 		return col_names.size();
 	}
 
+	inline std::vector<std::string> get_col_names() const {
+		return col_names;
+	}
+
 	template <class T>
 	inline std::vector<T> get_col_as(const std::string col_name) const {
 		std::vector<T> t_col(get_num_rows());
