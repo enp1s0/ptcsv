@@ -45,21 +45,16 @@ public:
 		load_csv(filename);
 	}
 
-	inline void load_csv(const std::string filename, const char comment_head = '\0') {
+	inline void load_csv(std::istream &ss, const char comment_head = '\0') {
 		std::string buffer;
-		std::ifstream ifs(filename);
 
-		if(!ifs) {
-			throw std::runtime_error("No such a file : " + filename);
-		}
-
-		while(std::getline(ifs, buffer) && buffer.data()[0] == comment_head);
+		while(std::getline(ss, buffer) && buffer.data()[0] == comment_head);
 		col_names = utils::split(buffer);
 		for(const auto& col_name : col_names) {
 			data.insert(std::make_pair(col_name, std::vector<std::string>{}));
 		}
 
-		while(std::getline(ifs, buffer)) {
+		while(std::getline(ss, buffer)) {
 			if(buffer.data()[0] == comment_head) {
 				continue;
 			}
@@ -69,6 +64,18 @@ public:
 			}
 			num_data++;
 		}
+	}
+
+	inline void load_csv(const std::string filename, const char comment_head = '\0') {
+		std::ifstream ifs(filename);
+
+		if(!ifs) {
+			throw std::runtime_error("No such a file : " + filename);
+		}
+
+		load_csv(ifs, comment_head);
+
+		ifs.close();
 	}
 
 	inline std::size_t get_num_rows() const {
