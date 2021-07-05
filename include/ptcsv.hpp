@@ -7,8 +7,10 @@
 #include <stdexcept>
 #include <sstream>
 #include <functional>
+#include <exception>
 
 #define PTCSV_AS_SET(type, func) template <> inline type as<type>(const std::string str) {return func(str.c_str());}
+#define PTCSV_CATCH_EXCEPTION(op, message) try{(op);} catch(const std::exception& e) {std::fprintf(stderr, "[PTCSV ERROR] %s [%s] @(%s l.%d in %s)\n", e.what(), (message).c_str(), __func__, __LINE__, __FILE__); throw e;}
 
 namespace mtk {
 namespace utils {
@@ -112,12 +114,12 @@ public:
 				const auto filter_col = filter.first;
 				const auto filter_func = filter.second;
 
-				add &= filter_func(data.at(filter_col)[i]);
+				PTCSV_CATCH_EXCEPTION(add &= filter_func(data.at(filter_col)[i]), std::string("filter_col = ") + filter_col);
 			}
 
 			if (add) {
 				for (const auto& col : col_names) {
-					new_ptcsv.data.at(col).push_back(data.at(col)[i]);
+					PTCSV_CATCH_EXCEPTION(new_ptcsv.data.at(col).push_back(data.at(col)[i]), std::string("col = ") + col);
 				}
 				num_added++;
 			}
@@ -136,7 +138,7 @@ public:
 		const auto filtered_data = get_rows(filter_func_map);
 		std::vector<T> t_col(filtered_data.size());
 		for(std::size_t i = 0; i < t_col.size(); i++) {
-			t_col[i] = utils::as<T>(filtered_data[i].at(col_name));
+			PTCSV_CATCH_EXCEPTION(t_col[i] = utils::as<T>(filtered_data[i].at(col_name)), std::string("col_name = ") + col_name);
 		}
 		return t_col;
 	}
@@ -144,7 +146,7 @@ public:
 	std::map<std::string, std::string> get_row_at(const std::size_t r) const {
 		std::map<std::string, std::string> row;
 		for(const auto& col_name : col_names) {
-			row.insert(std::make_pair(col_name, data.at(col_name)[r]));
+			PTCSV_CATCH_EXCEPTION(row.insert(std::make_pair(col_name, data.at(col_name)[r])), std::string("col_name = ") + col_name);
 		}
 		return row;
 	}
@@ -161,7 +163,7 @@ public:
 				const auto& filter_col = filter.first;
 				const filter_func_t filter_func = filter.second;
 
-				add &= filter_func(value.at(filter_col));
+				PTCSV_CATCH_EXCEPTION(add &= filter_func(value.at(filter_col)), std::string("filter_col = ") + filter_col);
 			}
 
 			if (add) {
