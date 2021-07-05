@@ -63,8 +63,37 @@ void test_filter() {
 	}
 }
 
+void test_filter_clone() {
+	std::cout << __func__ << std::endl;
+
+	std::stringstream ss;
+	ss << "A,B,C,D,E" << std::endl;
+	ss << "1,2,3,y,y" << std::endl;
+	ss << "6,7,8,y,n" << std::endl;
+	ss << "4,2,9,n,n" << std::endl;
+
+	mtk::ptcsv ptcsv;
+
+	ptcsv.load_csv(ss);
+
+	// filter
+	std::map<std::string, mtk::ptcsv::filter_func_t> filter_map;
+	filter_map.insert(std::make_pair("B", [](const std::string str){return (std::stoll(str) < 6);}));
+	filter_map.insert(std::make_pair("E", [](const std::string str){return str == "n";}));
+
+	const auto new_ptcsv = ptcsv.filter(filter_map);
+
+	for(const auto& row : new_ptcsv.get_rows()) {
+		for(const auto &item : row) {
+			std::printf("%5s : %s, ", item.first.c_str(), item.second.c_str());
+		}
+		std::printf("\n");
+	}
+}
+
 int main() {
 	test_from_file();
 	test_from_stream();
 	test_filter();
+	test_filter_clone();
 }
