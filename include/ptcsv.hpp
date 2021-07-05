@@ -94,6 +94,40 @@ public:
 		return col_names;
 	}
 
+	ptcsv filter(
+			const std::map<std::string, filter_func_t>& filter_func_map
+			) const {
+		ptcsv new_ptcsv;
+
+		new_ptcsv.col_names.resize(col_names.size());
+		for (unsigned i = 0; i < col_names.size(); i++) {
+			new_ptcsv.col_names[i] = col_names[i];
+			new_ptcsv.data.insert(std::make_pair(col_names[i], std::vector<std::string>{}));
+		}
+
+		std::size_t num_added = 0;
+		for (std::size_t i = 0; i < num_data; i++) {
+			bool add = true;
+			for (const auto& filter : filter_func_map) {
+				const auto filter_col = filter.first;
+				const auto filter_func = filter.second;
+
+				add &= filter_func(data.at(filter_col)[i]);
+			}
+
+			if (add) {
+				for (const auto& col : col_names) {
+					new_ptcsv.data.at(col).push_back(data.at(col)[i]);
+				}
+				num_added++;
+			}
+		}
+
+		new_ptcsv.num_data = num_added;
+
+		return new_ptcsv;
+	}
+
 	template <class T>
 	inline std::vector<T> get_col_as(
 			const std::string col_name,
