@@ -6,6 +6,7 @@
 #include <map>
 #include <stdexcept>
 #include <sstream>
+#include <functional>
 
 #define PTCSV_AS_SET(type, func) template <> inline type as<type>(const std::string str) {return func(str.c_str());}
 
@@ -34,7 +35,10 @@ inline std::vector<std::string> split(const std::string str) {
 	return splited;
 }
 } // namespace utils
+
 class ptcsv {
+public:
+	using filter_func_t = std::function<bool(const std::string&)>;
 private:
 	std::map<std::string, std::vector<std::string>> data;
 	std::size_t num_data;
@@ -91,10 +95,14 @@ public:
 	}
 
 	template <class T>
-	inline std::vector<T> get_col_as(const std::string col_name) const {
-		std::vector<T> t_col(get_num_rows());
-		for(std::size_t i = 0; i < get_num_rows(); i++) {
-			t_col[i] = utils::as<T>(data.at(col_name)[i]);
+	inline std::vector<T> get_col_as(
+			const std::string col_name,
+			const std::map<std::string, filter_func_t>& filter_func_map = std::map<std::string, filter_func_t>{}
+			) const {
+		const auto filtered_data = get_rows(filter_func_map);
+		std::vector<T> t_col(filtered_data.size());
+		for(std::size_t i = 0; i < t_col.size(); i++) {
+			t_col[i] = utils::as<T>(filtered_data[i].at(col_name));
 		}
 		return t_col;
 	}
@@ -107,10 +115,24 @@ public:
 		return row;
 	}
 
-	inline std::vector<std::map<std::string, std::string>> get_rows() const {
-		std::vector<std::map<std::string, std::string>> rows(num_data);
+	inline std::vector<std::map<std::string, std::string>> get_rows(
+			const std::map<std::string, filter_func_t>& filter_func_map = std::map<std::string, filter_func_t>{}
+			) const {
+		std::vector<std::map<std::string, std::string>> rows;
 		for(std::size_t i = 0; i < num_data; i++) {
-			rows[i] = get_row_at(i);
+			const auto value = get_row_at(i);
+
+			bool add = true;
+			for (const auto& filter : filter_func_map) {
+				const auto& filter_col = filter.first;
+				const filter_func_t filter_func = filter.second;
+
+				add &= filter_func(value.at(filter_col));
+			}
+
+			if (add) {
+				rows.push_back(value);
+			}
 		}
 		return rows;
 	}
