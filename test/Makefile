@@ -1,8 +1,8 @@
 CXX=g++
-CXXFLAGS=-std=c++11 -I../
+CXXFLAGS=-std=c++11 -I../include
 TARGET=test_ptcsv
 
-$(TARGET) : main.cpp ../ptcsv.hpp
+$(TARGET) : main.cpp ../include/ptcsv.hpp
 	$(CXX) $(CXXFLAGS) -o $@ $<
 
 clean:
