@@ -182,7 +182,11 @@ public:
 
 		for (const auto& row : get_rows()) {
 			for (unsigned i = 0; i < col_names.size(); i++) {
-				max_str_length.at(col_names[i]) = std::max(max_str_length.at(col_names[i]), static_cast<unsigned>(row.at(col_names[i]).length()));
+				max_str_length.at(col_names[i]) =
+					std::max(
+							max_str_length.at(col_names[i]),
+							static_cast<unsigned>(row.at(col_names[i]).length())
+							);
 			}
 		}
 
