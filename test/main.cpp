@@ -2,6 +2,7 @@
 #include <sstream>
 #include <cstdlib>
 #include <string>
+#include <random>
 #include <ptcsv.hpp>
 
 void test_from_file() {
@@ -69,12 +70,13 @@ void test_filter_clone() {
 	std::stringstream ss;
 	ss << "A,B,C,D,E" << std::endl;
 	ss << "1,2,3,y,y" << std::endl;
-	ss << "6,7,8,y,n" << std::endl;
+	ss << "8,7,8,y,n" << std::endl;
 	ss << "4,2,9,n,n" << std::endl;
 
 	mtk::ptcsv ptcsv;
 
 	ptcsv.load_csv(ss);
+	ptcsv.print();
 
 	// filter
 	std::map<std::string, mtk::ptcsv::filter_func_t> filter_map;
@@ -91,9 +93,38 @@ void test_filter_clone() {
 	}
 }
 
+void test_print() {
+	std::cout << __func__ << std::endl;
+
+	std::stringstream ss;
+	ss << "A,B,C,D,E" << std::endl;
+
+	std::mt19937 mt(std::random_device{}());
+	std::uniform_int_distribution<int> dist(0, 10);
+	for (unsigned i = 0; i < 10; i++) {
+		std::string line = "";
+		for (unsigned j = 0; j < 5; j++) {
+			const auto r = 1u << dist(mt);
+			line += std::to_string(r);
+			if (j != 5 - 1) {
+				line += ",";
+			}
+		}
+		ss << line << std::endl;
+	}
+
+	std::printf("%s", ss.str().c_str());
+
+	mtk::ptcsv ptcsv;
+
+	ptcsv.load_csv(ss);
+	ptcsv.print();
+}
+
 int main() {
 	test_from_file();
 	test_from_stream();
 	test_filter();
 	test_filter_clone();
+	test_print();
 }

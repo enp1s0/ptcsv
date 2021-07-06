@@ -172,6 +172,41 @@ public:
 		}
 		return rows;
 	}
+
+	// print
+	inline void print(FILE* const out = stdout) {
+		std::map<std::string, unsigned> max_str_length;
+		for (unsigned i = 0; i < col_names.size(); i++) {
+			max_str_length.insert(std::make_pair(col_names[i], col_names[i].length()));
+		}
+
+		for (const auto& row : get_rows()) {
+			for (unsigned i = 0; i < col_names.size(); i++) {
+				max_str_length.at(col_names[i]) =
+					std::max(
+							max_str_length.at(col_names[i]),
+							static_cast<unsigned>(row.at(col_names[i]).length())
+							);
+			}
+		}
+
+		for (unsigned i = 0; i < col_names.size(); i++) {
+			std::fprintf(out, "%*s", static_cast<int>(max_str_length.at(col_names[i])), col_names[i].c_str());
+			if (i != col_names.size() - 1) {
+				std::printf(", ");
+			}
+		}
+		std::fprintf(out, "\n");
+		for (const auto& row : get_rows()) {
+			for (unsigned i = 0; i < col_names.size(); i++) {
+				std::fprintf(out, "%*s", static_cast<int>(max_str_length.at(col_names[i])), row.at(col_names[i]).c_str());
+				if (i != col_names.size() - 1) {
+					std::printf(", ");
+				}
+			}
+			std::fprintf(out, "\n");
+		}
+	}
 };
 } // namespace mtk
 
