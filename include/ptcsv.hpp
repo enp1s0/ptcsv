@@ -174,7 +174,7 @@ public:
 	}
 
 	// print
-	inline void print(FILE* const out = stdout) {
+	inline void print(FILE* const out = stdout) const {
 		std::map<std::string, unsigned> max_str_length;
 		for (unsigned i = 0; i < col_names.size(); i++) {
 			max_str_length.insert(std::make_pair(col_names[i], col_names[i].length()));
