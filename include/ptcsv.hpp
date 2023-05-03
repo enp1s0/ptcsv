@@ -38,11 +38,45 @@ inline std::vector<std::string> split(const std::string str) {
 }
 } // namespace utils
 
+struct element_t {
+	std::string str_;
+	const char* c_str() const {
+		return str_.c_str();
+	}
+	const std::string& str() const {
+		return str_;
+	}
+	element_t() = default;
+	element_t(const std::string s) : str_(s) {}
+
+	operator int() const {
+		return std::stoi(str_);
+	}
+	operator unsigned() const {
+		return std::stoul(str_);
+	}
+	operator long() const {
+		return std::stol(str_);
+	}
+	operator unsigned long() const {
+		return std::stoul(str_);
+	}
+	operator double() const {
+		return std::stod(str_);
+	}
+	operator float() const {
+		return std::stof(str_);
+	}
+	operator std::string() const {
+		return str_;
+	}
+};
+
 class ptcsv {
 public:
 	using filter_func_t = std::function<bool(const std::string&)>;
 private:
-	std::map<std::string, std::vector<std::string>> data;
+	std::map<std::string, std::vector<element_t>> data;
 	std::size_t num_data;
 	std::vector<std::string> col_names;
 public:
@@ -57,7 +91,7 @@ public:
 		while(std::getline(ss, buffer) && buffer.data()[0] == comment_head);
 		col_names = utils::split(buffer);
 		for(const auto& col_name : col_names) {
-			data.insert(std::make_pair(col_name, std::vector<std::string>{}));
+			data.insert(std::make_pair(col_name, std::vector<element_t>{}));
 		}
 
 		while(std::getline(ss, buffer)) {
@@ -104,7 +138,7 @@ public:
 		new_ptcsv.col_names.resize(col_names.size());
 		for (unsigned i = 0; i < col_names.size(); i++) {
 			new_ptcsv.col_names[i] = col_names[i];
-			new_ptcsv.data.insert(std::make_pair(col_names[i], std::vector<std::string>{}));
+			new_ptcsv.data.insert(std::make_pair(col_names[i], std::vector<element_t>{}));
 		}
 
 		std::size_t num_added = 0;
@@ -114,7 +148,7 @@ public:
 				const auto filter_col = filter.first;
 				const auto filter_func = filter.second;
 
-				PTCSV_CATCH_EXCEPTION(add &= filter_func(data.at(filter_col)[i]), std::string("filter_col = ") + filter_col);
+				PTCSV_CATCH_EXCEPTION(add &= filter_func(data.at(filter_col)[i].str()), std::string("filter_col = ") + filter_col);
 			}
 
 			if (add) {
@@ -143,18 +177,18 @@ public:
 		return t_col;
 	}
 
-	std::map<std::string, std::string> get_row_at(const std::size_t r) const {
-		std::map<std::string, std::string> row;
+	std::map<std::string, element_t> get_row_at(const std::size_t r) const {
+		std::map<std::string, element_t> row;
 		for(const auto& col_name : col_names) {
 			PTCSV_CATCH_EXCEPTION(row.insert(std::make_pair(col_name, data.at(col_name)[r])), std::string("col_name = ") + col_name);
 		}
 		return row;
 	}
 
-	inline std::vector<std::map<std::string, std::string>> get_rows(
+	inline std::vector<std::map<std::string, element_t>> get_rows(
 			const std::map<std::string, filter_func_t>& filter_func_map = std::map<std::string, filter_func_t>{}
 			) const {
-		std::vector<std::map<std::string, std::string>> rows;
+		std::vector<std::map<std::string, element_t>> rows;
 		for(std::size_t i = 0; i < num_data; i++) {
 			const auto value = get_row_at(i);
 
@@ -163,7 +197,7 @@ public:
 				const auto& filter_col = filter.first;
 				const filter_func_t filter_func = filter.second;
 
-				PTCSV_CATCH_EXCEPTION(add &= filter_func(value.at(filter_col)), std::string("filter_col = ") + filter_col);
+				PTCSV_CATCH_EXCEPTION(add &= filter_func(value.at(filter_col).str()), std::string("filter_col = ") + filter_col);
 			}
 
 			if (add) {
@@ -185,7 +219,7 @@ public:
 				max_str_length.at(col_names[i]) =
 					std::max(
 							max_str_length.at(col_names[i]),
-							static_cast<unsigned>(row.at(col_names[i]).length())
+							static_cast<unsigned>(row.at(col_names[i]).str().length())
 							);
 			}
 		}
