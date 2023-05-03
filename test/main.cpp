@@ -121,10 +121,33 @@ void test_print() {
 	ptcsv.print();
 }
 
+void test_element_type_conversion() {
+	std::cout << __func__ << std::endl;
+
+	std::stringstream ss;
+	ss << "A,B,C" << std::endl;
+	ss << "1,2,3" << std::endl;
+	ss << "8,7,8" << std::endl;
+	ss << "4,2,9" << std::endl;
+
+	mtk::ptcsv ptcsv;
+
+	ptcsv.load_csv(ss);
+	ptcsv.print();
+
+	for(const auto& row : ptcsv.get_rows()) {
+		const int    a = row.at("A");
+		const double b = row.at("B");
+		const float  c = row.at("C");
+		std::printf("%d,%e,%e\n", a, b, c);
+	}
+}
+
 int main() {
 	test_from_file();
 	test_from_stream();
 	test_filter();
 	test_filter_clone();
 	test_print();
+	test_element_type_conversion();
 }
